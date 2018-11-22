@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script   src="https://code.jquery.com/jquery-3.3.1.js"   integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="   crossorigin="anonymous"></script>
+    <title>textlist</title>
+</head>
+<body background="background.png">
+  <h2>떠먹여 주는 맞춤법</h2>
+  <button id="mainButton" class="btn"><a href="main.html">대문</a></button>
+  <button id="textlist" class="btn"><a href="allcontent.html">글 모아보기</a></button>
+  <button id="analysislist" class="btn"><a href="analysis.html">글 분석내역</a></button>
+  <button id="lastranking" class="btn">지난주 언어습관</button>
+    <div id="userInfo"></div>
+    <div id="content"></div>
+
+</body>
+<script>
+
+    let userID = "whdtjr321"
+    let passWD = "whdtjr321"
+    $(function() {
+        userInfo();
+        showContent();
+    });
+
+    function userInfo(){
+        $.ajax({
+            url  :'https://82yssykh7i.execute-api.ap-northeast-2.amazonaws.com/capstone2/login/'+userID,
+            dataType: "json",
+            type: "POST",
+            cache: true,
+            jsonp: true,
+            jsonpCallback: "",
+            data : {
+				passWD : passWD,
+			},
+            success: function(data) {
+                let text = '<table class="table" id="userTable">';
+                text += "<tr>";
+                text += "<td>";
+                text += data.userID;
+                text += "</td>";
+                text += "<td>";
+                text += data.nickName;
+                text += "</td>";
+                text += "</table>";
+                $("#userInfo").html(text);
+            },
+            error : function(xhr, status, error){
+                alert("잠시 후 다시 시도해주세요.");
+            }
+        });
+    }
+
+    function showContent(){
+        $.ajax({
+            dataType: "json",
+            contentType:"application/json",
+            cache: true,
+            jsonp: true,
+            type: 'get' ,
+            url: 'https://82yssykh7i.execute-api.ap-northeast-2.amazonaws.com/capstone2/allcontent/' + userID ,
+            success: function(data) {
+                let text = '<table class="table" id="contentTable">';
+                console.log(data)
+                for(let i =0; i < data.Count; i++){
+                    text += "<tr>";
+                    text += "<td>";
+                    text += data.Items[i].contentB;
+                    text += "</td>";
+                    text += "<td>";
+                    if( data.Items[i].domainType == '1')
+                        text += "FaceBook";
+                    else if (data.Items[i].domainType == '2')
+                        text += "Naver Blog";
+                    text += "</td>";
+                    text += "</tr>";
+                }
+                text += '</table>';
+                console.log(text);
+                $("#content").html(text);
+            },
+            error : function(xhr, status, error){
+                alert("잠시 후 다시 시도해주세요.");
+            }
+        });
+    }
+
+
+
+
+</script>
+</html>
